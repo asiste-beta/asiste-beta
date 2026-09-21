@@ -1,15 +1,8 @@
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 
 from database import Base, engine
 from models import Student, Admin
-from utils import generar_usuario
-
-
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
+from utils import generar_usuario, hash_contraseña
 
 
 # Crear las tablas si todavía no existen
@@ -53,7 +46,7 @@ with Session(engine) as db:
             curso=data["curso"],
             codigo_barras=data["documento"],
             usuario=usuario,
-            contraseña=pwd_context.hash(data["documento"]),
+            contraseña=hash_contraseña(data["documento"]),
         )
 
         db.add(estudiante)
@@ -70,7 +63,7 @@ with Session(engine) as db:
             nombre=admin_data["nombre"],
             correo=admin_data["correo"],
             usuario=admin_data["usuario"],
-            contraseña=pwd_context.hash(admin_data["contraseña"]),
+            contraseña=hash_contraseña(admin_data["contraseña"]),
         )
         db.add(admin)
         print(f"Creado administrador -> usuario: {admin_data['usuario']} / contraseña: {admin_data['contraseña']}")

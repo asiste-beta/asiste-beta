@@ -2,20 +2,14 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 
 from database import get_db
 from models import Student
 from schemas import StudentCreateSchema, StudentOut
-from utils import generar_usuario
+from utils import generar_usuario, hash_contraseña
 
 
 router = APIRouter(prefix="/students", tags=["Estudiantes"])
-
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
 
 
 @router.get("/", response_model=List[StudentOut])
@@ -49,7 +43,7 @@ def crear_estudiante(
         codigo_barras=data.codigo_barras,
         usuario=usuario,
         # La contraseña inicial del estudiante es su número de documento
-        contraseña=pwd_context.hash(data.codigo_barras),
+        contraseña=hash_contraseña(data.codigo_barras),
     )
 
     db.add(nuevo_estudiante)

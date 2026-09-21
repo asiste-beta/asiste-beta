@@ -47,6 +47,32 @@ def calcular_estado(fecha_asistencia_utc: datetime, con_excusa: bool = False) ->
     return "tarde"
 
 
+import bcrypt
+
+
+def hash_contraseña(contraseña: str) -> str:
+    """
+    Genera el hash de una contraseña con bcrypt.
+
+    bcrypt solo usa los primeros 72 bytes de la contraseña; se trunca a
+    propósito para que nunca reviente con documentos o textos largos
+    (en vez de usar passlib, que dejó de llevarse bien con las versiones
+    nuevas de la librería bcrypt).
+    """
+    return bcrypt.hashpw(
+        contraseña.encode("utf-8")[:72],
+        bcrypt.gensalt()
+    ).decode("utf-8")
+
+
+def verificar_contraseña(contraseña: str, hash_guardado: str) -> bool:
+    """Compara una contraseña en texto plano contra su hash guardado."""
+    return bcrypt.checkpw(
+        contraseña.encode("utf-8")[:72],
+        hash_guardado.encode("utf-8")
+    )
+
+
 def generar_usuario(nombre_completo: str, documento: str) -> str:
     """
     Genera el nombre de usuario de un estudiante a partir de su nombre

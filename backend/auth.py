@@ -1,18 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 
 from database import get_db
 from models import Student, Admin
 from schemas import LoginSchema
+from utils import verificar_contraseña
 
 
 router = APIRouter(prefix="/auth", tags=["Autenticación"])
-
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
 
 
 @router.post("/login")
@@ -28,7 +23,7 @@ def login(
     )
 
     if estudiante:
-        if not pwd_context.verify(data.contraseña, estudiante.contraseña):
+        if not verificar_contraseña(data.contraseña, estudiante.contraseña):
             raise HTTPException(
                 status_code=401,
                 detail="Contraseña incorrecta"
@@ -51,7 +46,7 @@ def login(
     )
 
     if admin:
-        if not pwd_context.verify(data.contraseña, admin.contraseña):
+        if not verificar_contraseña(data.contraseña, admin.contraseña):
             raise HTTPException(
                 status_code=401,
                 detail="Contraseña incorrecta"
