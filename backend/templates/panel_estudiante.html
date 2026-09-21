@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    {% include "_head.html" %}
+    <title>ASISTE | Panel del estudiante</title>
+</head>
+<body>
+    {% include "_iconos.html" %}
+
+    <header class="barra">
+        <div class="barra-interior">
+            <div class="marca">
+                <span class="marca-icono"><svg class="icono" aria-hidden="true"><use href="#i-scan-barcode"></use></svg></span>
+                <span class="marca-texto">ASISTE</span>
+            </div>
+
+            <div class="barra-acciones">
+                <button type="button" id="btn-tema" class="boton-icono" aria-label="Cambiar tema" title="Cambiar tema">
+                    <svg class="icono icono-sol" aria-hidden="true"><use href="#i-sun"></use></svg>
+                    <svg class="icono icono-luna" aria-hidden="true"><use href="#i-moon"></use></svg>
+                </button>
+                <button type="button" id="btn-salir" class="boton boton-fantasma">
+                    <svg class="icono" aria-hidden="true"><use href="#i-log-out"></use></svg>
+                    Salir
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="contenido">
+        <section class="saludo">
+            <div class="avatar" id="avatar" aria-hidden="true"></div>
+            <div>
+                <h1 id="saludo">Hola</h1>
+                <p class="subtitulo" id="info-curso"></p>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <svg class="icono" aria-hidden="true"><use href="#i-calendar-check"></use></svg>
+                <h2>Mi historial de asistencia</h2>
+                <span id="contador-historial" class="contador"></span>
+            </div>
+
+            <div class="tabla-wrap">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo-historial">
+                        <tr><td colspan="2">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/comun.js"></script>
+    <script>
+        const datos = JSON.parse(sessionStorage.getItem("asiste_usuario"));
+
+        if (!datos || datos.tipo !== "estudiante") {
+            window.location.href = "/";
+        } else {
+            document.getElementById("saludo").textContent = `Hola, ${datos.nombre}`;
+            document.getElementById("avatar").textContent = iniciales(datos.nombre);
+            document.getElementById("info-curso").textContent =
+                `Grado ${datos.grado} · Curso ${datos.curso}`;
+
+            cargarHistorial(datos.id);
+        }
+
+        document.getElementById("btn-salir").addEventListener("click", () => {
+            sessionStorage.removeItem("asiste_usuario");
+            window.location.href = "/";
+        });
+
+        async function cargarHistorial(idEstudiante) {
+            const respuesta = await fetch(`/attendance/estudiante/${idEstudiante}`);
+            const registros = await respuesta.json();
+
+            const cuerpo = document.getElementById("cuerpo-historial");
+            cuerpo.innerHTML = "";
+            document.getElementById("contador-historial").textContent = registros.length;
+
+            if (registros.length === 0) {
+                cuerpo.innerHTML = `<tr><td colspan="2">Todavía no tienes asistencias registradas</td></tr>`;
+                return;
+            }
+
+            registros.forEach((registro) => {
+                const fecha = parseFechaUTC(registro.fecha_asistencia);
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                    <td>${fecha.toLocaleDateString()}</td>
+                    <td>${fecha.toLocaleTimeString()}</td>
+                `;
+                cuerpo.appendChild(fila);
+            });
+        }
+    </script>
+</body>
+</html>

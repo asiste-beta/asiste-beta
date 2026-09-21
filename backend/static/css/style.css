@@ -1,0 +1,710 @@
+/* ==========================================================================
+   ASISTE · hoja de estilos
+   - Tema OSCURO por defecto. El claro se activa con <html data-theme="light">
+     (botón sol/luna de la barra superior; la elección se guarda en el navegador).
+   - Todos los colores viven en las variables de :root: para cambiar la paleta
+     basta con editar ese bloque.
+   ========================================================================== */
+
+:root {
+    color-scheme: dark;
+
+    /* Superficies */
+    --fondo: #0a0a0b;
+    --superficie: #111113;
+    --superficie-2: #18181b;
+    --superficie-3: #212126;
+    --barra-fondo: rgba(10, 10, 11, 0.78);
+    --resplandor: rgba(108, 92, 231, 0.16);
+
+    /* Bordes */
+    --borde: #26262b;
+    --borde-fuerte: #3a3a42;
+
+    /* Texto */
+    --texto: #ededef;
+    --texto-suave: #b4b4bc;
+    --texto-tenue: #8a8a93;
+
+    /* Acento (violeta de la marca) */
+    --acento: #6c5ce7;
+    --acento-hover: #7d6ff0;
+    --acento-claro: #a99ff7;
+    --acento-suave: rgba(124, 106, 247, 0.16);
+
+    /* Estados */
+    --exito: #34d399;
+    --exito-suave: rgba(52, 211, 153, 0.12);
+    --error: #f87171;
+    --error-suave: rgba(248, 113, 113, 0.12);
+
+    /* Forma y sombra */
+    --radio: 14px;
+    --radio-sm: 10px;
+    --sombra: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+
+    /* Tipografía */
+    --fuente: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    --fondo: #f6f6f7;
+    --superficie: #ffffff;
+    --superficie-2: #f4f4f5;
+    --superficie-3: #ececee;
+    --barra-fondo: rgba(246, 246, 247, 0.8);
+    --resplandor: rgba(108, 92, 231, 0.09);
+
+    --borde: #e4e4e7;
+    --borde-fuerte: #d0d0d6;
+
+    --texto: #18181b;
+    --texto-suave: #52525b;
+    --texto-tenue: #71717a;
+
+    --acento: #6c5ce7;
+    --acento-hover: #5b4bd6;
+    --acento-claro: #5b4bd6;
+    --acento-suave: rgba(108, 92, 231, 0.12);
+
+    --exito: #047857;
+    --exito-suave: rgba(4, 120, 87, 0.10);
+    --error: #b91c1c;
+    --error-suave: rgba(185, 28, 28, 0.08);
+
+    --sombra: 0 1px 2px rgba(0, 0, 0, 0.04), 0 16px 40px -20px rgba(0, 0, 0, 0.18);
+}
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    color: var(--texto);
+    font-family: var(--fuente);
+    font-size: 15px;
+    line-height: 1.55;
+    background:
+        radial-gradient(900px 420px at 50% -140px, var(--resplandor), transparent 70%) no-repeat,
+        var(--fondo);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+button,
+input {
+    font: inherit;
+    color: inherit;
+}
+
+h1, h2, p {
+    margin: 0;
+}
+
+::selection {
+    background: var(--acento-suave);
+}
+
+/* ---------- Iconos SVG ---------- */
+/* Todos los iconos toman el color del texto que los rodea (currentColor). */
+
+.icono {
+    width: 18px;
+    height: 18px;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------- Marca ---------- */
+
+.marca {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.marca-icono {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    color: #ffffff;
+    background: var(--acento);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset, 0 8px 20px -8px var(--acento);
+}
+
+.marca-texto {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+
+/* ---------- Botones ---------- */
+
+.boton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 18px;
+    border: 1px solid transparent;
+    border-radius: var(--radio-sm);
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.08s;
+}
+
+.boton:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.boton:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+.boton-primario {
+    color: #ffffff;
+    background: var(--acento);
+}
+
+.boton-primario:hover:not(:disabled) {
+    background: var(--acento-hover);
+}
+
+.boton-fantasma {
+    height: 38px;
+    padding: 0 12px;
+    color: var(--texto-suave);
+    background: transparent;
+}
+
+.boton-fantasma:hover {
+    color: var(--texto);
+    background: var(--superficie-2);
+}
+
+.boton-bloque {
+    width: 100%;
+}
+
+.boton-icono {
+    display: inline-grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-sm);
+    color: var(--texto-suave);
+    background: var(--superficie);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.boton-icono:hover {
+    color: var(--texto);
+    background: var(--superficie-2);
+    border-color: var(--borde-fuerte);
+}
+
+.boton:focus-visible,
+.boton-icono:focus-visible {
+    outline: 2px solid var(--acento-claro);
+    outline-offset: 2px;
+}
+
+/* Interruptor de tema: en oscuro se muestra el sol (para pasar a claro) y
+   en claro se muestra la luna (para volver a oscuro). */
+.icono-luna {
+    display: none;
+}
+
+:root[data-theme="light"] .icono-sol {
+    display: none;
+}
+
+:root[data-theme="light"] .icono-luna {
+    display: block;
+}
+
+/* ---------- Formularios ---------- */
+
+.formulario {
+    display: grid;
+    gap: 14px;
+}
+
+.fila-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.campo {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.campo label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--texto-suave);
+}
+
+input {
+    width: 100%;
+    height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-sm);
+    background: var(--superficie-2);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+input::placeholder {
+    color: var(--texto-tenue);
+}
+
+input:hover {
+    border-color: var(--borde-fuerte);
+}
+
+input:focus {
+    border-color: var(--acento-claro);
+    box-shadow: 0 0 0 3px var(--acento-suave);
+}
+
+/* El autocompletado de Chrome pinta los campos de azul claro; esto lo evita. */
+input:-webkit-autofill {
+    -webkit-text-fill-color: var(--texto);
+    caret-color: var(--texto);
+    box-shadow: 0 0 0 1000px var(--superficie-2) inset;
+}
+
+/* Campo con icono a la izquierda */
+.entrada {
+    position: relative;
+}
+
+.entrada .icono {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    transform: translateY(-50%);
+    color: var(--texto-tenue);
+    pointer-events: none;
+}
+
+.entrada input {
+    padding-left: 40px;
+}
+
+.entrada:focus-within .icono {
+    color: var(--acento-claro);
+}
+
+/* En el celular, 16px evita que iOS haga zoom al tocar un campo. */
+@media (max-width: 640px) {
+    input {
+        font-size: 16px;
+    }
+}
+
+/* ---------- Mensajes (éxito / error / neutro) ---------- */
+
+.mensaje {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--texto-suave);
+}
+
+.mensaje:empty {
+    display: none;
+}
+
+.mensaje .icono {
+    margin-top: 2px;
+}
+
+.mensaje.exito,
+.mensaje.error {
+    padding: 10px 12px;
+    border-radius: var(--radio-sm);
+    font-weight: 500;
+}
+
+.mensaje.exito {
+    color: var(--exito);
+    background: var(--exito-suave);
+}
+
+.mensaje.error {
+    color: var(--error);
+    background: var(--error-suave);
+}
+
+/* ---------- Tarjeta de login ---------- */
+
+.pagina-centrada {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.esquina {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+}
+
+.tarjeta {
+    width: 100%;
+    max-width: 400px;
+    padding: 32px 28px 28px;
+    border: 1px solid var(--borde);
+    border-radius: 18px;
+    background: var(--superficie);
+    box-shadow: var(--sombra);
+}
+
+.titulo {
+    margin-top: 28px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+}
+
+.subtitulo {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--texto-suave);
+}
+
+.tarjeta .formulario {
+    margin-top: 24px;
+}
+
+.tarjeta .mensaje {
+    margin-top: 16px;
+}
+
+/* ---------- Barra superior de los paneles ---------- */
+
+.barra {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid var(--borde);
+    background: var(--barra-fondo);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+}
+
+.barra-interior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 12px 20px;
+}
+
+.barra-acciones {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ---------- Contenido de los paneles ---------- */
+
+.contenido {
+    display: grid;
+    gap: 16px;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 28px 20px 64px;
+}
+
+.saludo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 8px;
+}
+
+.saludo h1 {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 46px;
+    height: 46px;
+    border: 1px solid var(--borde-fuerte);
+    border-radius: 50%;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--acento-claro);
+    background: var(--acento-suave);
+}
+
+.rejilla {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 860px) {
+    .rejilla {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.panel {
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    background: var(--superficie);
+}
+
+.panel-cabecera {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.panel-cabecera .icono {
+    color: var(--acento-claro);
+}
+
+.panel-cabecera h2 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.contador {
+    margin-left: auto;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--texto-suave);
+    background: var(--superficie-3);
+}
+
+.contador:empty {
+    display: none;
+}
+
+.ayuda {
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--texto-suave);
+}
+
+/* ---------- Escáner de cámara ---------- */
+
+.visor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    border: 1px dashed var(--borde-fuerte);
+    border-radius: var(--radio);
+    background: var(--superficie-2);
+}
+
+.visor:has(#qr-reader:not(:empty)) {
+    border-style: solid;
+}
+
+/* La librería html5-qrcode le pone su propio borde gris al contenedor. */
+#qr-reader {
+    width: 100%;
+    border: 0 !important;
+}
+
+#qr-reader video {
+    display: block;
+    max-width: 100%;
+}
+
+/* Texto de "cámara apagada": se oculta solo cuando la librería
+   mete el video dentro de #qr-reader. */
+.visor-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 28px 16px;
+    font-size: 14px;
+    text-align: center;
+    color: var(--texto-tenue);
+}
+
+.visor-vacio .icono {
+    width: 30px;
+    height: 30px;
+    stroke-width: 1.4;
+}
+
+#qr-reader:not(:empty) + .visor-vacio {
+    display: none;
+}
+
+/* ---------- Tablas ---------- */
+
+.tabla-wrap {
+    overflow-x: auto;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+}
+
+.tabla th {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--borde);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--texto-tenue);
+}
+
+.tabla td {
+    padding: 12px;
+    border-bottom: 1px solid var(--borde);
+    white-space: nowrap;
+}
+
+.tabla tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.tabla tbody tr:hover td {
+    background: var(--superficie-2);
+}
+
+.tabla td.mono {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--texto-suave);
+}
+
+/* Filas de aviso ("Cargando...", "sin registros", errores) */
+.tabla td[colspan] {
+    padding: 28px 12px;
+    text-align: center;
+    white-space: normal;
+    color: var(--texto-tenue);
+}
+
+.tabla td[colspan].error {
+    color: var(--error);
+}
+
+/* En el celular las tablas se compactan para que se vean todas las columnas
+   sin tener que deslizar de lado: el nombre y el usuario pueden partirse en
+   dos líneas. */
+@media (max-width: 640px) {
+    .panel {
+        padding: 16px;
+    }
+
+    .tabla {
+        font-size: 13px;
+    }
+
+    .tabla th,
+    .tabla td {
+        padding: 10px 6px;
+    }
+
+    .tabla td:first-child {
+        white-space: normal;
+    }
+
+    .tabla td.mono {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+/* ---------- Animación de entrada (suave) ---------- */
+
+@keyframes aparecer {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.tarjeta,
+.saludo,
+.panel {
+    animation: aparecer 0.35s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}

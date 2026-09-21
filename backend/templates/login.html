@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    {% include "_head.html" %}
+    <title>ASISTE | Iniciar sesión</title>
+</head>
+<body class="pagina-centrada">
+    {% include "_iconos.html" %}
+
+    <div class="esquina">
+        <button type="button" id="btn-tema" class="boton-icono" aria-label="Cambiar tema" title="Cambiar tema">
+            <svg class="icono icono-sol" aria-hidden="true"><use href="#i-sun"></use></svg>
+            <svg class="icono icono-luna" aria-hidden="true"><use href="#i-moon"></use></svg>
+        </button>
+    </div>
+
+    <main class="tarjeta">
+        <div class="marca">
+            <span class="marca-icono"><svg class="icono" aria-hidden="true"><use href="#i-scan-barcode"></use></svg></span>
+            <span class="marca-texto">ASISTE</span>
+        </div>
+
+        <h1 class="titulo">Iniciar sesión</h1>
+        <p class="subtitulo">Control de asistencia por código de barras</p>
+
+        <form id="form-login" class="formulario">
+            <div class="campo">
+                <label for="usuario">Usuario</label>
+                <div class="entrada">
+                    <svg class="icono" aria-hidden="true"><use href="#i-user"></use></svg>
+                    <input type="text" id="usuario" placeholder="Ej: medwin4917232*" autocomplete="username" required>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label for="contraseña">Contraseña</label>
+                <div class="entrada">
+                    <svg class="icono" aria-hidden="true"><use href="#i-lock"></use></svg>
+                    <input type="password" id="contraseña" placeholder="Tu documento" autocomplete="current-password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="boton boton-primario boton-bloque">
+                Ingresar
+                <svg class="icono" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+            </button>
+        </form>
+
+        <p id="mensaje-error" class="mensaje error" role="alert"></p>
+    </main>
+
+    <script src="/static/js/comun.js"></script>
+    <script>
+        const form = document.getElementById("form-login");
+        const mensajeError = document.getElementById("mensaje-error");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            pintarMensaje(mensajeError, "", "error");
+
+            const usuario = document.getElementById("usuario").value;
+            const contraseña = document.getElementById("contraseña").value;
+
+            try {
+                const respuesta = await fetch("/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ usuario, contraseña })
+                });
+
+                const datos = await respuesta.json();
+
+                if (!respuesta.ok) {
+                    pintarMensaje(mensajeError, datos.detail || "No se pudo iniciar sesión", "error");
+                    return;
+                }
+
+                sessionStorage.setItem("asiste_usuario", JSON.stringify(datos));
+
+                if (datos.tipo === "estudiante") {
+                    window.location.href = "/panel-estudiante";
+                } else {
+                    window.location.href = "/panel-admin";
+                }
+            } catch (error) {
+                pintarMensaje(mensajeError, "Error de conexión con el servidor", "error");
+            }
+        });
+    </script>
+</body>
+</html>

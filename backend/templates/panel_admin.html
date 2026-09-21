@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    {% include "_head.html" %}
+    <title>ASISTE | Panel del administrador</title>
+</head>
+<body>
+    {% include "_iconos.html" %}
+
+    <header class="barra">
+        <div class="barra-interior">
+            <div class="marca">
+                <span class="marca-icono"><svg class="icono" aria-hidden="true"><use href="#i-scan-barcode"></use></svg></span>
+                <span class="marca-texto">ASISTE</span>
+            </div>
+
+            <div class="barra-acciones">
+                <button type="button" id="btn-tema" class="boton-icono" aria-label="Cambiar tema" title="Cambiar tema">
+                    <svg class="icono icono-sol" aria-hidden="true"><use href="#i-sun"></use></svg>
+                    <svg class="icono icono-luna" aria-hidden="true"><use href="#i-moon"></use></svg>
+                </button>
+                <button type="button" id="btn-salir" class="boton boton-fantasma">
+                    <svg class="icono" aria-hidden="true"><use href="#i-log-out"></use></svg>
+                    Salir
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="contenido">
+        <section class="saludo">
+            <div class="avatar" id="avatar" aria-hidden="true"></div>
+            <div>
+                <h1 id="saludo">Hola</h1>
+                <p class="subtitulo">Panel del administrador</p>
+            </div>
+        </section>
+
+        <div class="rejilla">
+            <section class="panel">
+                <div class="panel-cabecera">
+                    <svg class="icono" aria-hidden="true"><use href="#i-scan-barcode"></use></svg>
+                    <h2>Registrar asistencia</h2>
+                </div>
+
+                <p class="ayuda">Abre la cámara y apunta al código de barras del carnet.</p>
+
+                <div class="visor">
+                    <div id="qr-reader"></div>
+                    <div class="visor-vacio">
+                        <svg class="icono" aria-hidden="true"><use href="#i-camera"></use></svg>
+                        <span>Aquí aparecerá la cámara</span>
+                    </div>
+                </div>
+
+                <button type="button" id="btn-camara" class="boton boton-primario boton-bloque">
+                    <svg class="icono" aria-hidden="true"><use href="#i-camera"></use></svg>
+                    Abrir cámara
+                </button>
+
+                <p id="mensaje-escaner" class="mensaje" role="status"></p>
+            </section>
+
+            <section class="panel">
+                <div class="panel-cabecera">
+                    <svg class="icono" aria-hidden="true"><use href="#i-user-plus"></use></svg>
+                    <h2>Agregar estudiante</h2>
+                </div>
+
+                <form id="form-estudiante" class="formulario">
+                    <div class="campo">
+                        <label for="nombre">Nombre completo</label>
+                        <input type="text" id="nombre" placeholder="Ej: María Pérez Gómez" autocomplete="off" required>
+                    </div>
+
+                    <div class="fila-2">
+                        <div class="campo">
+                            <label for="grado">Grado</label>
+                            <input type="text" id="grado" placeholder="Ej: 11" autocomplete="off" required>
+                        </div>
+                        <div class="campo">
+                            <label for="curso">Curso</label>
+                            <input type="text" id="curso" placeholder="Ej: 05" autocomplete="off" required>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="documento">Número de documento</label>
+                        <input type="text" id="documento" placeholder="Ej: 1234567890" autocomplete="off" required>
+                    </div>
+
+                    <button type="submit" class="boton boton-primario boton-bloque">
+                        <svg class="icono" aria-hidden="true"><use href="#i-user-plus"></use></svg>
+                        Crear estudiante
+                    </button>
+                </form>
+
+                <p id="mensaje-estudiante" class="mensaje" role="status"></p>
+            </section>
+        </div>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <svg class="icono" aria-hidden="true"><use href="#i-users"></use></svg>
+                <h2>Estudiantes registrados</h2>
+                <span id="contador-estudiantes" class="contador"></span>
+            </div>
+
+            <div class="tabla-wrap">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Grado</th>
+                            <th>Curso</th>
+                            <th>Usuario</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo-estudiantes">
+                        <tr><td colspan="4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-cabecera">
+                <svg class="icono" aria-hidden="true"><use href="#i-calendar-check"></use></svg>
+                <h2>Asistencia registrada hoy</h2>
+                <span id="contador-asistencia" class="contador"></span>
+            </div>
+
+            <div class="tabla-wrap">
+                <table class="tabla">
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpo-asistencia">
+                        <tr><td colspan="3">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/comun.js"></script>
+    <script>
+        const datos = JSON.parse(sessionStorage.getItem("asiste_usuario"));
+
+        if (!datos || datos.tipo !== "admin") {
+            window.location.href = "/";
+        } else {
+            document.getElementById("saludo").textContent = `Hola, ${datos.nombre}`;
+            document.getElementById("avatar").textContent = iniciales(datos.nombre);
+        }
+
+        document.getElementById("btn-salir").addEventListener("click", () => {
+            sessionStorage.removeItem("asiste_usuario");
+            window.location.href = "/";
+        });
+
+        // ---------- Ayudas para pintar tablas (textContent evita inyectar HTML) ----------
+
+        function agregarFila(cuerpo, valores, clases = []) {
+            const fila = document.createElement("tr");
+            valores.forEach((valor, i) => {
+                const celda = document.createElement("td");
+                celda.textContent = valor;
+                if (clases[i]) celda.className = clases[i];
+                fila.appendChild(celda);
+            });
+            cuerpo.appendChild(fila);
+        }
+
+        function agregarFilaMensaje(cuerpo, columnas, texto, clase) {
+            const fila = document.createElement("tr");
+            const celda = document.createElement("td");
+            celda.colSpan = columnas;
+            celda.textContent = texto;
+            if (clase) celda.className = clase;
+            fila.appendChild(celda);
+            cuerpo.appendChild(fila);
+        }
+
+        // ---------- Estudiantes ----------
+
+        let estudiantesPorId = {};
+
+        async function cargarEstudiantes() {
+            const cuerpo = document.getElementById("cuerpo-estudiantes");
+            const contador = document.getElementById("contador-estudiantes");
+
+            try {
+                const estudiantes = await pedirJSON("/students/");
+
+                if (!Array.isArray(estudiantes)) {
+                    throw new Error("El servidor devolvió un formato inesperado");
+                }
+
+                estudiantesPorId = {};
+                cuerpo.innerHTML = "";
+                contador.textContent = estudiantes.length;
+
+                if (estudiantes.length === 0) {
+                    agregarFilaMensaje(
+                        cuerpo, 4,
+                        "No hay estudiantes en la base de datos a la que está conectado este servidor. " +
+                        "Si ya los habías cargado, revisa que DATABASE_URL apunte a la misma base donde corriste seed.py."
+                    );
+                    return;
+                }
+
+                estudiantes.forEach((est) => {
+                    estudiantesPorId[est.id] = est;
+                    agregarFila(cuerpo, [est.nombre, est.grado, est.curso, est.usuario], ["", "", "", "mono"]);
+                });
+            } catch (error) {
+                cuerpo.innerHTML = "";
+                contador.textContent = "";
+                agregarFilaMensaje(cuerpo, 4, `No se pudo cargar la lista: ${error.message}`, "error");
+            }
+        }
+
+        document.getElementById("form-estudiante").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const mensaje = document.getElementById("mensaje-estudiante");
+
+            try {
+                const resultado = await pedirJSON("/students/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        nombre: document.getElementById("nombre").value,
+                        grado: document.getElementById("grado").value,
+                        curso: document.getElementById("curso").value,
+                        codigo_barras: document.getElementById("documento").value
+                    })
+                });
+
+                pintarMensaje(mensaje, `Creado. Usuario: ${resultado.usuario} (contraseña = documento)`, "exito");
+                document.getElementById("form-estudiante").reset();
+                cargarEstudiantes();
+            } catch (error) {
+                pintarMensaje(mensaje, error.message || "No se pudo crear el estudiante", "error");
+            }
+        });
+
+        // ---------- Asistencia de hoy ----------
+
+        async function cargarAsistencia() {
+            const cuerpo = document.getElementById("cuerpo-asistencia");
+
+            try {
+                const registros = await pedirJSON("/attendance/");
+                const hoy = new Date().toDateString();
+
+                const deHoy = registros
+                    .map((registro) => ({ ...registro, fecha: parseFechaUTC(registro.fecha_asistencia) }))
+                    .filter((registro) => registro.fecha.toDateString() === hoy)
+                    .sort((a, b) => b.fecha - a.fecha);
+
+                cuerpo.innerHTML = "";
+                document.getElementById("contador-asistencia").textContent = deHoy.length;
+
+                if (deHoy.length === 0) {
+                    agregarFilaMensaje(cuerpo, 3, "Todavía no hay asistencia registrada hoy");
+                    return;
+                }
+
+                deHoy.forEach((registro) => {
+                    const estudiante = estudiantesPorId[registro.student_id];
+                    agregarFila(cuerpo, [
+                        estudiante ? estudiante.nombre : `Estudiante #${registro.student_id}`,
+                        registro.fecha.toLocaleDateString(),
+                        registro.fecha.toLocaleTimeString()
+                    ]);
+                });
+            } catch (error) {
+                cuerpo.innerHTML = "";
+                document.getElementById("contador-asistencia").textContent = "";
+                agregarFilaMensaje(cuerpo, 3, `No se pudo cargar la asistencia: ${error.message}`, "error");
+            }
+        }
+
+        cargarEstudiantes().then(cargarAsistencia);
+
+        // ---------- Escaneo con la cámara ----------
+
+        // La librería se pide a un CDN; si el primero falla se prueba el segundo.
+        const URLS_LIBRERIA_CAMARA = [
+            "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js",
+            "https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"
+        ];
+
+        function cargarScript(url) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement("script");
+                script.src = url;
+                script.onload = resolve;
+                script.onerror = () => {
+                    script.remove();
+                    reject(new Error("No cargó " + url));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        async function asegurarLibreriaCamara() {
+            if (typeof Html5Qrcode !== "undefined") return;
+
+            for (const url of URLS_LIBRERIA_CAMARA) {
+                try {
+                    await cargarScript(url);
+                    if (typeof Html5Qrcode !== "undefined") return;
+                } catch (error) {
+                    // probar con la siguiente URL
+                }
+            }
+
+            throw new Error(
+                "No se pudo cargar la librería de la cámara. " +
+                "Revisa tu conexión a internet e inténtalo de nuevo."
+            );
+        }
+
+        // Se precarga en segundo plano para que el botón responda rápido.
+        asegurarLibreriaCamara().catch(() => {});
+
+        const btnCamara = document.getElementById("btn-camara");
+        const mensajeEscaner = document.getElementById("mensaje-escaner");
+
+        let lector = null;
+        let estadoCamara = "detenida"; // detenida | iniciando | activa | deteniendo
+        let procesandoLectura = false;
+
+        function mostrarMensajeEscaner(texto, clase) {
+            pintarMensaje(mensajeEscaner, texto, clase);
+        }
+
+        function mensajeErrorCamara(error) {
+            const texto = String((error && (error.message || error.name)) || error);
+
+            if (/NotAllowed|Permission|denied/i.test(texto)) {
+                return "El navegador no tiene permiso para usar la cámara. " +
+                       "Toca el candado junto a la dirección, permite la cámara y vuelve a intentar.";
+            }
+            if (/NotFound|Requested device not found|no camera/i.test(texto)) {
+                return "No se encontró ninguna cámara en este dispositivo.";
+            }
+            if (/NotReadable|in use|Could not start video/i.test(texto)) {
+                return "La cámara está siendo usada por otra aplicación. Ciérrala e inténtalo de nuevo.";
+            }
+            return "No se pudo acceder a la cámara: " + texto;
+        }
+
+        async function iniciarCamara() {
+            if (estadoCamara !== "detenida") return;
+
+            if (!window.isSecureContext) {
+                mostrarMensajeEscaner(
+                    "La cámara solo funciona en páginas seguras. Abre esta página con https:// " +
+                    "(la dirección debe empezar por https).",
+                    "error"
+                );
+                return;
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                mostrarMensajeEscaner("Este navegador no permite usar la cámara.", "error");
+                return;
+            }
+
+            estadoCamara = "iniciando";
+            btnCamara.disabled = true;
+            mostrarMensajeEscaner("Abriendo cámara...", "");
+
+            try {
+                await asegurarLibreriaCamara();
+
+                lector = new Html5Qrcode("qr-reader", {
+                    verbose: false,
+                    formatsToSupport: [
+                        Html5QrcodeSupportedFormats.CODE_128,
+                        Html5QrcodeSupportedFormats.CODE_39,
+                        Html5QrcodeSupportedFormats.CODE_93,
+                        Html5QrcodeSupportedFormats.ITF,
+                        Html5QrcodeSupportedFormats.EAN_13,
+                        Html5QrcodeSupportedFormats.EAN_8,
+                        Html5QrcodeSupportedFormats.UPC_A,
+                        Html5QrcodeSupportedFormats.UPC_E,
+                        Html5QrcodeSupportedFormats.CODABAR,
+                        Html5QrcodeSupportedFormats.QR_CODE
+                    ]
+                });
+
+                await lector.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        // Recuadro ancho y bajo: los códigos de barras son alargados.
+                        qrbox: (ancho) => ({ width: Math.min(300, Math.floor(ancho * 0.9)), height: 140 })
+                    },
+                    alDetectarCodigo,
+                    () => { /* frame sin código: ignorar */ }
+                );
+
+                estadoCamara = "activa";
+                ponerContenidoBoton(btnCamara, "x", "Cerrar cámara");
+                mostrarMensajeEscaner("Apunta al código de barras...", "");
+            } catch (error) {
+                estadoCamara = "detenida";
+                lector = null;
+                mostrarMensajeEscaner(mensajeErrorCamara(error), "error");
+            } finally {
+                btnCamara.disabled = false;
+            }
+        }
+
+        async function detenerCamara() {
+            if (estadoCamara !== "activa" || !lector) return;
+
+            estadoCamara = "deteniendo";
+
+            try {
+                await lector.stop();
+                lector.clear();
+            } catch (error) {
+                // si ya estaba detenida no pasa nada
+            }
+
+            lector = null;
+            estadoCamara = "detenida";
+            ponerContenidoBoton(btnCamara, "camera", "Abrir cámara");
+        }
+
+        btnCamara.addEventListener("click", () => {
+            if (estadoCamara === "activa") {
+                detenerCamara();
+                mostrarMensajeEscaner("", "");
+            } else {
+                iniciarCamara();
+            }
+        });
+
+        // La cámara puede detectar el mismo código varias veces seguidas;
+        // este candado evita registrar la asistencia más de una vez.
+        async function alDetectarCodigo(codigo) {
+            if (procesandoLectura) return;
+            procesandoLectura = true;
+
+            try {
+                await detenerCamara();
+                await registrarAsistencia(codigo.trim());
+            } finally {
+                procesandoLectura = false;
+            }
+        }
+
+        async function registrarAsistencia(codigo) {
+            try {
+                const resultado = await pedirJSON("/attendance/registrar", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ codigo_barras: codigo })
+                });
+
+                const estudiante = estudiantesPorId[resultado.student_id];
+                mostrarMensajeEscaner(
+                    `Asistencia registrada: ${estudiante ? estudiante.nombre : "estudiante #" + resultado.student_id}`,
+                    "exito"
+                );
+                cargarAsistencia();
+            } catch (error) {
+                // Se muestra el código leído para poder comparar con el documento guardado.
+                mostrarMensajeEscaner(`${error.message} (código leído: ${codigo})`, "error");
+            }
+        }
+    </script>
+</body>
+</html>
