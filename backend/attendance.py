@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import Student, Attendance
-from schemas import AttendanceRegisterSchema, AttendanceOut
+from schemas import AttendanceRegisterSchema, AttendanceOut, ExcusaSchema
 
 
 router = APIRouter(prefix="/attendance", tags=["Asistencia"])
@@ -35,6 +35,40 @@ def registrar_asistencia(
     db.refresh(nueva_asistencia)
 
     return nueva_asistencia
+
+
+@router.patch("/{asistencia_id}/excusa", response_model=AttendanceOut)
+def registrar_excusa(
+    asistencia_id: int,
+    data: ExcusaSchema,
+    db: Session = Depends(get_db)
+):
+    asistencia = (
+        db.query(Attendance)
+        .filter(Attendance.id == asistencia_id)
+        .first()
+    )
+
+    if not asistencia:
+        raise HTTPException(
+            status_code=404,
+            detail="Registro de asistencia no encontrado"
+        )
+
+    motivo = data.motivo.strip()
+    if not motivo:
+        raise HTTPException(
+            status_code=400,
+            detail="El motivo de la excusa no puede estar vacío"
+        )
+
+    asistencia.con_excusa = True
+    asistencia.motivo_excusa = motivo
+
+    db.commit()
+    db.refresh(asistencia)
+
+    return asistencia
 
 
 @router.get("/", response_model=List[AttendanceOut])

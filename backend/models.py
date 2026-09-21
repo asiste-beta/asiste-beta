@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -48,6 +48,12 @@ class Attendance(Base):
         default=datetime.utcnow,
         nullable=False
     )
+
+    # Excepciones: si el estudiante llegó con excusa, el registro se marca
+    # como "justificada" sin importar qué tan tarde haya llegado. Se agrega
+    # después de registrada la asistencia, desde el panel del administrador.
+    con_excusa = Column(Boolean, default=False, nullable=False)
+    motivo_excusa = Column(String(255), nullable=True)
 
     student = relationship(
         "Student",

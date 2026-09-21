@@ -35,6 +35,8 @@
     /* Estados */
     --exito: #34d399;
     --exito-suave: rgba(52, 211, 153, 0.12);
+    --advertencia: #fbbf24;
+    --advertencia-suave: rgba(251, 191, 36, 0.14);
     --error: #f87171;
     --error-suave: rgba(248, 113, 113, 0.12);
 
@@ -72,6 +74,8 @@
 
     --exito: #047857;
     --exito-suave: rgba(4, 120, 87, 0.10);
+    --advertencia: #b45309;
+    --advertencia-suave: rgba(180, 83, 9, 0.10);
     --error: #b91c1c;
     --error-suave: rgba(185, 28, 28, 0.08);
 
@@ -419,6 +423,92 @@ input:-webkit-autofill {
     margin-top: 16px;
 }
 
+/* ---------- Envoltorio de la página de login (tarjeta + info del proyecto) ---------- */
+
+.pagina-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    width: 100%;
+}
+
+.info-proyecto {
+    width: 100%;
+    max-width: 440px;
+    padding: 26px 28px;
+    border: 1px solid var(--borde);
+    border-radius: 18px;
+    background: var(--superficie);
+    box-shadow: var(--sombra);
+}
+
+.info-proyecto h2 {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.info-proyecto > p {
+    margin-top: 10px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--texto-suave);
+}
+
+.info-proyecto > p strong {
+    color: var(--texto);
+}
+
+.lista-caracteristicas {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+    list-style: none;
+}
+
+.lista-caracteristicas li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.lista-caracteristicas .icono {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    color: var(--acento-claro);
+}
+
+.lista-caracteristicas strong {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+}
+
+.lista-caracteristicas span {
+    display: block;
+    margin-top: 2px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--texto-suave);
+}
+
+@media (min-width: 860px) {
+    .pagina-login {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+        max-width: 900px;
+    }
+
+    .info-proyecto {
+        margin-top: 0;
+    }
+}
+
 /* ---------- Barra superior de los paneles ---------- */
 
 .barra {
@@ -652,6 +742,71 @@ input:-webkit-autofill {
 
 .tabla td[colspan].error {
     color: var(--error);
+}
+
+/* ---------- Estado de la asistencia (a tiempo / tardanza / tarde) ---------- */
+
+.estado {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.estado-a_tiempo {
+    color: var(--exito);
+    background: var(--exito-suave);
+}
+
+.estado-tardanza {
+    color: var(--advertencia);
+    background: var(--advertencia-suave);
+}
+
+.estado-tarde {
+    color: var(--error);
+    background: var(--error-suave);
+}
+
+.estado-justificada {
+    color: var(--acento-claro);
+    background: var(--acento-suave);
+}
+
+/* Botón para agregar una excusa a un registro con tardanza o tarde */
+.boton-excusa {
+    display: block;
+    margin-top: 6px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--acento-claro);
+    cursor: pointer;
+}
+
+.boton-excusa:hover {
+    text-decoration: underline;
+}
+
+.boton-excusa:disabled {
+    opacity: 0.5;
+    cursor: default;
+    text-decoration: none;
+}
+
+/* Motivo de la excusa, una vez guardado */
+.nota-excusa {
+    margin-top: 4px;
+    max-width: 220px;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: normal;
+    color: var(--texto-tenue);
 }
 
 /* En el celular las tablas se compactan para que se vean todas las columnas

@@ -137,10 +137,11 @@
                             <th>Estudiante</th>
                             <th>Fecha</th>
                             <th>Hora</th>
+                            <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody id="cuerpo-asistencia">
-                        <tr><td colspan="3">Cargando...</td></tr>
+                        <tr><td colspan="4">Cargando...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -251,6 +252,90 @@
 
         // ---------- Asistencia de hoy ----------
 
+        // Etiquetas legibles para cada estado que calcula el backend
+        // (ver backend/utils.py -> calcular_estado).
+        const ETIQUETAS_ESTADO = {
+            a_tiempo: "A tiempo",
+            tardanza: "Tardanza",
+            tarde: "Tarde",
+            justificada: "Justificada"
+        };
+
+        function crearBadgeEstado(estado) {
+            const span = document.createElement("span");
+            span.className = `estado estado-${estado}`;
+            span.textContent = ETIQUETAS_ESTADO[estado] || estado;
+            return span;
+        }
+
+        function crearFilaAsistencia(registro, estudiante) {
+            const fila = document.createElement("tr");
+
+            const tdNombre = document.createElement("td");
+            tdNombre.textContent = estudiante ? estudiante.nombre : `Estudiante #${registro.student_id}`;
+            fila.appendChild(tdNombre);
+
+            const tdFecha = document.createElement("td");
+            tdFecha.textContent = registro.fecha.toLocaleDateString();
+            fila.appendChild(tdFecha);
+
+            const tdHora = document.createElement("td");
+            tdHora.textContent = registro.fecha.toLocaleTimeString();
+            fila.appendChild(tdHora);
+
+            const tdEstado = document.createElement("td");
+            tdEstado.appendChild(crearBadgeEstado(registro.estado));
+
+            if (registro.con_excusa) {
+                if (registro.motivo_excusa) {
+                    const nota = document.createElement("div");
+                    nota.className = "nota-excusa";
+                    nota.textContent = registro.motivo_excusa;
+                    tdEstado.appendChild(nota);
+                }
+            } else if (registro.estado === "tardanza" || registro.estado === "tarde") {
+                const boton = document.createElement("button");
+                boton.type = "button";
+                boton.className = "boton-excusa";
+                boton.textContent = "+ agregar excusa";
+                boton.addEventListener("click", () => agregarExcusa(registro.id, boton));
+                tdEstado.appendChild(boton);
+            }
+
+            fila.appendChild(tdEstado);
+            return fila;
+        }
+
+        async function agregarExcusa(asistenciaId, boton) {
+            const motivo = window.prompt(
+                "Motivo de la excusa (ej: cita médica, transporte, permiso de un acudiente...):"
+            );
+
+            // null = el usuario le dio "Cancelar"
+            if (motivo === null) return;
+            if (!motivo.trim()) return;
+
+            boton.disabled = true;
+            boton.textContent = "Guardando...";
+
+            try {
+                await pedirJSON(`/attendance/${asistenciaId}/excusa`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ motivo: motivo.trim() })
+                });
+                cargarAsistencia();
+            } catch (error) {
+                boton.disabled = false;
+                boton.textContent = "+ agregar excusa";
+                pintarMensaje(
+                    document.getElementById("mensaje-escaner"),
+                    error.message || "No se pudo guardar la excusa",
+                    "error"
+                );
+            }
+        }
+
         async function cargarAsistencia() {
             const cuerpo = document.getElementById("cuerpo-asistencia");
 
@@ -267,22 +352,18 @@
                 document.getElementById("contador-asistencia").textContent = deHoy.length;
 
                 if (deHoy.length === 0) {
-                    agregarFilaMensaje(cuerpo, 3, "Todavía no hay asistencia registrada hoy");
+                    agregarFilaMensaje(cuerpo, 4, "Todavía no hay asistencia registrada hoy");
                     return;
                 }
 
                 deHoy.forEach((registro) => {
                     const estudiante = estudiantesPorId[registro.student_id];
-                    agregarFila(cuerpo, [
-                        estudiante ? estudiante.nombre : `Estudiante #${registro.student_id}`,
-                        registro.fecha.toLocaleDateString(),
-                        registro.fecha.toLocaleTimeString()
-                    ]);
+                    cuerpo.appendChild(crearFilaAsistencia(registro, estudiante));
                 });
             } catch (error) {
                 cuerpo.innerHTML = "";
                 document.getElementById("contador-asistencia").textContent = "";
-                agregarFilaMensaje(cuerpo, 3, `No se pudo cargar la asistencia: ${error.message}`, "error");
+                agregarFilaMensaje(cuerpo, 4, `No se pudo cargar la asistencia: ${error.message}`, "error");
             }
         }
 

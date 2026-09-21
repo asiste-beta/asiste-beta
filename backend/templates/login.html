@@ -14,40 +14,78 @@
         </button>
     </div>
 
-    <main class="tarjeta">
-        <div class="marca">
-            <span class="marca-icono"><svg class="icono" aria-hidden="true"><use href="#i-scan-barcode"></use></svg></span>
-            <span class="marca-texto">ASISTE</span>
-        </div>
-
-        <h1 class="titulo">Iniciar sesión</h1>
-        <p class="subtitulo">Control de asistencia por código de barras</p>
-
-        <form id="form-login" class="formulario">
-            <div class="campo">
-                <label for="usuario">Usuario</label>
-                <div class="entrada">
-                    <svg class="icono" aria-hidden="true"><use href="#i-user"></use></svg>
-                    <input type="text" id="usuario" placeholder="Ej: medwin4917232*" autocomplete="username" required>
-                </div>
+    <div class="pagina-login">
+        <main class="tarjeta">
+            <div class="marca">
+                <span class="marca-icono"><svg class="icono" aria-hidden="true"><use href="#i-scan-barcode"></use></svg></span>
+                <span class="marca-texto">ASISTE</span>
             </div>
 
-            <div class="campo">
-                <label for="contraseña">Contraseña</label>
-                <div class="entrada">
-                    <svg class="icono" aria-hidden="true"><use href="#i-lock"></use></svg>
-                    <input type="password" id="contraseña" placeholder="Tu documento" autocomplete="current-password" required>
+            <h1 class="titulo">Iniciar sesión</h1>
+            <p class="subtitulo">Control de asistencia por código de barras</p>
+
+            <form id="form-login" class="formulario">
+                <div class="campo">
+                    <label for="usuario">Usuario</label>
+                    <div class="entrada">
+                        <svg class="icono" aria-hidden="true"><use href="#i-user"></use></svg>
+                        <input type="text" id="usuario" placeholder="Ej: medwin4917232*" autocomplete="username" required>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="boton boton-primario boton-bloque">
-                Ingresar
-                <svg class="icono" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
-            </button>
-        </form>
+                <div class="campo">
+                    <label for="contraseña">Contraseña</label>
+                    <div class="entrada">
+                        <svg class="icono" aria-hidden="true"><use href="#i-lock"></use></svg>
+                        <input type="password" id="contraseña" placeholder="Tu documento" autocomplete="current-password" required>
+                    </div>
+                </div>
 
-        <p id="mensaje-error" class="mensaje error" role="alert"></p>
-    </main>
+                <button type="submit" class="boton boton-primario boton-bloque">
+                    Ingresar
+                    <svg class="icono" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+                </button>
+            </form>
+
+            <p id="mensaje-error" class="mensaje error" role="alert"></p>
+        </main>
+
+        <aside class="info-proyecto">
+            <h2>¿Qué es ASISTE?</h2>
+            <p>
+                <strong>ASISTE</strong> es un proyecto desarrollado por los estudiantes de
+                grado <strong>11°05</strong> en el marco de su formación con el
+                <strong>SENA</strong>. Nace para modernizar el control de asistencia
+                escolar, reemplazando los listados en papel por un registro digital
+                rápido y confiable, escaneando el código de barras del carné
+                estudiantil.
+            </p>
+
+            <ul class="lista-caracteristicas">
+                <li>
+                    <svg class="icono" aria-hidden="true"><use href="#i-scan-barcode"></use></svg>
+                    <div>
+                        <strong>Registro por código de barras</strong>
+                        <span>Se escanea el carné del estudiante y la asistencia queda registrada al instante.</span>
+                    </div>
+                </li>
+                <li>
+                    <svg class="icono" aria-hidden="true"><use href="#i-clock"></use></svg>
+                    <div>
+                        <strong>Llegada a tiempo o tardanza</strong>
+                        <span>El sistema distingue automáticamente si el registro fue a tiempo, con tardanza o tarde, según la hora de la jornada.</span>
+                    </div>
+                </li>
+                <li>
+                    <svg class="icono" aria-hidden="true"><use href="#i-graduation-cap"></use></svg>
+                    <div>
+                        <strong>Proyecto formativo del SENA</strong>
+                        <span>Una solución tecnológica pensada y construida por estudiantes para una necesidad real del colegio.</span>
+                    </div>
+                </li>
+            </ul>
+        </aside>
+    </div>
 
     <script src="/static/js/comun.js"></script>
     <script>
